@@ -7,33 +7,33 @@
 <br>
 
 ## 👥 Team 
-<img width="705" alt="스크린샷 2024-11-09 오전 12 30 41" src="https://github.com/user-attachments/assets/b8f0d04b-ba3f-4c70-a080-95f88ab01401">
+<img width="705" alt="스크린샷 2024-11-09 오전 12 30 41" src="https://github.com/user-attachments/assets/b8f0d04b-ba3f-4c70-a080-95f88ab01401" width="1000">
 
 <br>
 
 ## ERD 
-<img width="536" alt="스크린샷 2024-11-09 오전 12 36 00" src="https://github.com/user-attachments/assets/2fdc7482-d748-409c-9615-4ed691badc70">
+<img width="536" alt="스크린샷 2024-11-09 오전 12 36 00" src="https://github.com/user-attachments/assets/2fdc7482-d748-409c-9615-4ed691badc70" width="1000">
 
 <br>
 
 ## Wireframe 
-<img width="705" alt="스크린샷 2024-11-09 오전 12 35 23" src="https://github.com/user-attachments/assets/74613e42-9b00-4257-b4bb-bd05eab42a31">
+<img width="705" alt="스크린샷 2024-11-09 오전 12 35 23" src="https://github.com/user-attachments/assets/74613e42-9b00-4257-b4bb-bd05eab42a31" width="1000">
 
 <br>
 
 ## Management Tool 
-<img width="702" alt="스크린샷 2024-11-09 오전 12 34 21" src="https://github.com/user-attachments/assets/05ce1355-9108-4904-b9cd-62c7fd219a3c">
+<img width="702" alt="스크린샷 2024-11-09 오전 12 34 21" src="https://github.com/user-attachments/assets/05ce1355-9108-4904-b9cd-62c7fd219a3c" width="1000">
 
 <br>
 
 ## ⚙️ Tech Stack
-<img width="1271" alt="스크린샷 2024-10-29 오후 8 43 15" src="https://github.com/user-attachments/assets/95b675a1-1c3a-4dac-b323-c11925d1a104">
+<img width="1271" alt="스크린샷 2024-10-29 오후 8 43 15" src="https://github.com/user-attachments/assets/95b675a1-1c3a-4dac-b323-c11925d1a104" width="1000">
 
 <br>
 
 ## 📑 Web Pages 
 
-<img width="670" alt="스크린샷 2024-11-07 오후 5 23 10" src="https://github.com/user-attachments/assets/0a190d67-3cf5-4c24-9e8d-e06e93e1fa8c">
+<img width="670" alt="스크린샷 2024-11-07 오후 5 23 10" src="https://github.com/user-attachments/assets/0a190d67-3cf5-4c24-9e8d-e06e93e1fa8c" width="1000">
 
 <br>
 
