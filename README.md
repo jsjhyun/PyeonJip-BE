@@ -1,4 +1,4 @@
-<img width="1493" alt="스크린샷 2024-11-09 오전 12 58 20" src="https://github.com/user-attachments/assets/c2f1f292-601b-4de7-a553-ab69c07fe4e0"><h1 align="center">펴ㄴ지ㅂ : 가구 온라인 쇼핑몰</h1>
+<h1 align="center">펴ㄴ지ㅂ : 가구 온라인 쇼핑몰</h1>
 
 ## ⌘ About The Project
 편안하게 집을 편집하다. 
@@ -15,7 +15,7 @@
 <br>
 
 ## ⛓️‍💥 ERD 
-<img width="705" alt="스크린샷 2024-11-09 오전 12 58 20" src="https://github.com/user-attachments/assets/97bf00fb-ec74-4c1d-954a-b04f08b1cb22">
+<img width="705" alt="스크린샷 2024-11-09 오전 12 58 20" src="https://github.com/user-attachments/assets/c2f1f292-601b-4de7-a553-ab69c07fe4e0">
 
 <br>
 
