@@ -34,7 +34,7 @@
 
 <br>
 
-## 📑 Web Pages 
+## 📑 Web Page
 
 <img width="600" alt="스크린샷 2024-11-07 오후 5 23 10" src="https://github.com/user-attachments/assets/0a190d67-3cf5-4c24-9e8d-e06e93e1fa8c">
 
@@ -43,19 +43,5 @@
 </div>
 
 <div align="center">
-
-### [Order]
-
-#### 주문 페이지 | 관리자 페이지: 주문 관리
-<img src="https://github.com/user-attachments/assets/2c0806d4-1a15-4a37-bde8-f1aadeda3c6b" alt="Order Page" width="300" height="300">
-<img src="https://github.com/user-attachments/assets/81d05e77-d3a8-4ded-8505-f0f31204d712" alt="Admin Order Management" width="300" height="300">
-
-<br>
-
-#### 마이페이지: 주문 목록 | 등급 관리
-<img src="https://github.com/user-attachments/assets/a3ccb356-287d-48c0-9093-fdf02c826126" alt="MyPage Orders" width="300" height="300">
-<img src="https://github.com/user-attachments/assets/10650122-0ffa-482f-8761-1e0da944e8e0" alt="Grade Management" width="300" height="300">
-
-</div>
 
 <br>
