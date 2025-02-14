@@ -21,17 +21,12 @@ public class CustomUserDetailsService implements UserDetailsService {
     // email을 매개변수로 가지도록 재정의
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        System.out.println("📌 [DEBUG] 찾는 이메일: " + email);
+        User userData = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
 
-        User userData = userRepository.findByEmail(email).orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND));
+        System.out.println("📌 [DEBUG] 찾은 사용자: " + userData.getEmail());
 
-        // 데이터 유효성 검증
-        if (userData != null) {
-
-            // AuthenticationManager에게 userData를 넘겨준다.
-            return new CustomUserDetails(userData);
-        }
-
-
-        return null;
+        return new CustomUserDetails(userData);
     }
 }

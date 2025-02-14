@@ -6,6 +6,7 @@ import com.team5.pyeonjip.global.exception.ResourceNotFoundException;
 import com.team5.pyeonjip.order.dto.*;
 import com.team5.pyeonjip.order.entity.Delivery;
 import com.team5.pyeonjip.order.entity.Order;
+import com.team5.pyeonjip.order.entity.OrderDetail;
 import com.team5.pyeonjip.order.enums.DeliveryStatus;
 import com.team5.pyeonjip.order.enums.OrderStatus;
 import com.team5.pyeonjip.order.mapper.OrderMapper;
@@ -40,52 +41,70 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
     }
 
-    // 주문 생성
     @Transactional
     @Override
     public void createOrder(CombinedOrderDto combinedOrderDto, String userEmail) {
-
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
+        User user = getUserByEmail(userEmail);  // 유저 조회
 
         // 배송 정보 생성
-        Delivery delivery = Delivery.builder()
-                .address(combinedOrderDto.getOrderRequestDto().getAddress())  // 전달된 주소 사용
-                .status(DeliveryStatus.READY)  // 기본 상태를 READY로 설정
-                .build();
-        deliveryRepository.save(delivery);
-
-        // 장바구니 쿠폰 적용된 가격
-        Long cartTotalPrice = combinedOrderDto.getOrderCartRequestDto().getCartTotalPrice();
-
-        // 전체 주문 금액
-        Long totalPrice = calculateTotalPrice(user, cartTotalPrice);
+        Delivery delivery = createDelivery(combinedOrderDto);
 
         // 주문 생성
-        Order order = OrderMapper.toOrderEntity(combinedOrderDto.getOrderRequestDto(), delivery, user, totalPrice);
-        orderRepository.save(order);
+        Long totalPrice = calculateTotalPrice(user, combinedOrderDto.getOrderCartRequestDto().getCartTotalPrice());
+        Order order = createOrderEntity(combinedOrderDto, delivery, user, totalPrice);
 
-        // 주문 상세 정보 생성
+        // 주문 상세 정보 생성 및 재고 감소 처리
         combinedOrderDto.getOrderRequestDto().getOrderDetails().forEach(orderDetailDto -> {
-            ProductDetail productDetail = findProductDetailById(orderDetailDto.getProductDetailId());
-
-            // 재고 수량 확인
-            if (productDetail.getQuantity() < orderDetailDto.getQuantity()) {
-                throw new GlobalException(ErrorCode.OUT_OF_STOCK);
-            }
-
-            // 주문 후 재고 수량 감소
-            productDetail.setQuantity(productDetail.getQuantity() - orderDetailDto.getQuantity());
-            productDetailRepository.save(productDetail);
-
-            // 주문 상세 저장
-            orderDetailRepository.save(OrderMapper.toOrderDetailEntity(order, productDetail, orderDetailDto));
+            reduceStock(orderDetailDto);
+            createOrderDetail(order, orderDetailDto);
         });
 
-        // 사용자의 총 구매 금액을 주문 후 계산
-        Long totalSpent = orderRepository.getTotalPriceByUser(user.getEmail());
+        // 사용자 회원 등급 업데이트
+        updateUserGrade(user);
+    }
 
-        // 사용자의 회원 등급 업데이트
+    // 유저 조회
+    private User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("유저를 찾을 수 없습니다."));
+    }
+
+    // 배송 정보 생성
+    private Delivery createDelivery(CombinedOrderDto combinedOrderDto) {
+        Delivery delivery = Delivery.builder()
+                .address(combinedOrderDto.getOrderRequestDto().getAddress())
+                .status(DeliveryStatus.READY)
+                .build();
+        return deliveryRepository.save(delivery);
+    }
+
+    // 주문 엔티티 생성
+    private Order createOrderEntity(CombinedOrderDto combinedOrderDto, Delivery delivery, User user, Long totalPrice) {
+        Order order = OrderMapper.toOrderEntity(combinedOrderDto.getOrderRequestDto(), delivery, user, totalPrice);
+        return orderRepository.save(order);
+    }
+
+    // 재고 감소
+    // TODO : Redis 분산 락
+    private void reduceStock(OrderDetailDto orderDetailDto) {
+        ProductDetail productDetail = findProductDetailById(orderDetailDto.getProductDetailId());
+        if (productDetail.getQuantity() < orderDetailDto.getQuantity()) {
+            throw new GlobalException(ErrorCode.OUT_OF_STOCK);
+        }
+        productDetail.setQuantity(productDetail.getQuantity() - orderDetailDto.getQuantity());
+        productDetailRepository.save(productDetail);
+    }
+
+    // 주문 상세 생성
+    private void createOrderDetail(Order order, OrderDetailDto orderDetailDto) {
+        ProductDetail productDetail = findProductDetailById(orderDetailDto.getProductDetailId());
+        OrderDetail orderDetail = OrderMapper.toOrderDetailEntity(order, productDetail, orderDetailDto);
+        orderDetailRepository.save(orderDetail);
+    }
+
+    // 회원 등급 업데이트
+    private void updateUserGrade(User user) {
+        Long totalSpent = orderRepository.getTotalPriceByUser(user.getEmail());
         updateUserGrade(user, totalSpent);
         userRepository.save(user);
     }
@@ -161,9 +180,16 @@ public class OrderServiceImpl implements OrderService {
             throw new GlobalException(ErrorCode.DELIVERY_ALREADY_STARTED);
         }
 
+        // 주문 상태 업데이트
         order.updateStatus(OrderStatus.CANCEL);
 
         // 재고 복구
+        restoreProductStock(order);
+    }
+
+    // 재고 복구
+    // TODO : Redis 분산 락
+    private void restoreProductStock(Order order) {
         order.getOrderDetails().forEach(orderDetail -> {
             ProductDetail productDetail = findProductDetailById(orderDetail.getProduct().getId());
             productDetailService.updateDetailQuantity(productDetail.getId(), orderDetail.getQuantity());

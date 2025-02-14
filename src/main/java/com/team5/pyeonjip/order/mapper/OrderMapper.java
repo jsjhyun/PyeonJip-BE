@@ -35,7 +35,7 @@ public class OrderMapper {
     }
 
     // 관리자 : entity -> dto
-    public static AdminOrderResponseDto toAdminOrderResponseDto(Order order, Long deliveryPrice, double discountRate) {
+    public static AdminOrderResponseDto toAdminOrderResponseDto(Order order, Long deliveryPrice, double discountRate) { // deliveryPrice,discountRate 엔티티 필드 추가
         return AdminOrderResponseDto.builder()
                 .id(order.getId())
                 .userEmail(order.getUser().getEmail())

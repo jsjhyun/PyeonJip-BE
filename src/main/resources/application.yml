@@ -25,6 +25,7 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
-app:
-  api:
-    url: https://dsrkzpzrzxqkarjw.tunnel-pt.elice.io
+
+#app:
+#  api:
+#    url: https://dsrkzpzrzxqkarjw.tunnel-pt.elice.io

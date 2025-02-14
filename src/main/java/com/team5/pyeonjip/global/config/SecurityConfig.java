@@ -7,6 +7,7 @@ import com.team5.pyeonjip.global.jwt.JWTFilter;
 import com.team5.pyeonjip.global.jwt.JWTUtil;
 import com.team5.pyeonjip.global.jwt.LoginFilter;
 import com.team5.pyeonjip.user.repository.RefreshRepository;
+import com.team5.pyeonjip.user.repository.UserRepository;
 import com.team5.pyeonjip.user.service.ReissueService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -33,6 +35,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final UserRepository userRepository;
     private final RefreshRepository refreshRepository;
     private final ReissueService reissueService;
     private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -57,22 +60,22 @@ public class SecurityConfig {
 
         http
                 .cors((cors) -> cors
-                        .configurationSource(new CorsConfigurationSource() {
-                            @Override
-                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        .configurationSource(request -> {
+                            CorsConfiguration configuration = new CorsConfiguration();
 
-                                CorsConfiguration configuration = new CorsConfiguration();
-
-                                // 데이터를 보내는 80번 포트를 허용
-                                configuration.setAllowedOrigins(Collections.singletonList("https://ehedrefxzmygttpe.tunnel-pt.elice.io"));
+                            // 데이터를 보내는 80번 포트를 허용
+                                configuration.setAllowedOrigins(List.of(
+                                        "http://localhost:3000"
+                                        // "https://ehedrefxzmygttpe.tunnel-pt.elice.io"
+                                ));
 
                                 // 모든 메서드 허용
-                                configuration.setAllowedMethods(Collections.singletonList("*"));
+                                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
 
                                 configuration.setAllowCredentials(true);
 
                                 // 허용할 헤더
-                                configuration.setAllowedHeaders(Collections.singletonList("*"));
+                                configuration.setAllowedHeaders(List.of("*"));
 
                                 // 허용 시간
 //                                configuration.setMaxAge(3600L);
@@ -81,7 +84,6 @@ public class SecurityConfig {
                                 configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
                                 return configuration;
-                            }
                         }));
         // csrf 비활성화. JWT는 세션을 stateless로 관리하기 때문
         http
@@ -160,8 +162,16 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 //      LoginFilter
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, refreshRepository, reissueService), UsernamePasswordAuthenticationFilter.class);
-//      LogoutFilter
+                .addFilterAt(new LoginFilter(
+                        authenticationManager(authenticationConfiguration),
+                        jwtUtil,
+                        refreshRepository,
+                        reissueService,
+                        userRepository,
+                        bCryptPasswordEncoder()
+                ), UsernamePasswordAuthenticationFilter.class);
+
+        //      LogoutFilter
         http
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class);
         // 세션 설정
