@@ -131,9 +131,9 @@ public class OrderServiceImpl implements OrderService {
 
     // 사용자 등급 업데이트 로직
     private void updateUserGrade(User user, Long totalSpent) {
-        if (totalSpent >= 2000000) {
+        if (totalSpent >= 3000000) {
             user.setGrade(Grade.GOLD);
-        } else if (totalSpent >= 1000000) {
+        } else if (totalSpent >= 2000000) {
             user.setGrade(Grade.SILVER);
         } else {
             user.setGrade(Grade.BRONZE);
@@ -185,6 +185,23 @@ public class OrderServiceImpl implements OrderService {
 
         // 재고 복구
         restoreProductStock(order);
+
+        updateUserGradeAfterCancel(order.getUser(), order.getTotalPrice());
+    }
+
+    private void updateUserGradeAfterCancel(User user, Long orderTotalPrice){
+
+        Long totalSpent = orderRepository.getTotalPriceByUser(user.getEmail());
+
+        Long updatedTotalSpent = totalSpent - orderTotalPrice;
+
+        if(updatedTotalSpent < 0){
+            updatedTotalSpent = 0L;
+        }
+
+        updateUserGrade(user, updatedTotalSpent);
+
+        userRepository.save(user);
     }
 
     // 재고 복구
