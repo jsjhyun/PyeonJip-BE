@@ -76,6 +76,13 @@ dependencies {
 
 	// JSON
 	implementation 'net.minidev:json-smart:2.4.10'
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
+
+	// H2
+	testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
