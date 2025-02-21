@@ -16,16 +16,13 @@ public class OrderMapper {
     // 사용자 : entity -> dto
     public static OrderResponseDto toOrderResponseDto(Order order) {
         return OrderResponseDto.builder()
-                .id(order.getId())
                 .orderStatus(order.getStatus())
-                .deliveryStatus(order.getDelivery().getStatus())
+                .deliveryStatus(order.getDelivery().getStatus()) // 주문 생성 시 READY : null X
                 .createdAt(order.getCreatedAt())
                 .totalPrice(order.getTotalPrice())
                 .orderDetails(order.getOrderDetails().stream()
                         .map(detail -> OrderDetailDto.builder()
-                                .productDetailId(detail.getProduct().getId())
                                 .productName(detail.getProductName())
-                                .productPrice(detail.getProductPrice())
                                 .subTotalPrice(detail.getSubTotalPrice())
                                 .productImage(detail.getProduct().getMainImage())
                                 .quantity(detail.getQuantity())
@@ -35,7 +32,7 @@ public class OrderMapper {
     }
 
     // 관리자 : entity -> dto
-    public static AdminOrderResponseDto toAdminOrderResponseDto(Order order, Long deliveryPrice, double discountRate) { // deliveryPrice,discountRate 엔티티 필드 추가
+    public static AdminOrderResponseDto toAdminOrderResponseDto(Order order, Long deliveryPrice, double discountRate) {
         return AdminOrderResponseDto.builder()
                 .id(order.getId())
                 .userEmail(order.getUser().getEmail())
@@ -45,11 +42,10 @@ public class OrderMapper {
                 .totalPrice(order.getTotalPrice()) // 전체 주문 금액
                 .createdAt(order.getCreatedAt())
                 .deliveryStatus(order.getDelivery().getStatus())
-                .deliveryPrice(deliveryPrice) // 배송비 추가
-                .discountRate(discountRate) // 할인율 추가
+                .deliveryPrice(deliveryPrice)
+                .discountRate(discountRate)
                 .orderDetails(order.getOrderDetails().stream()
                         .map(detail -> OrderDetailDto.builder()
-                                .productDetailId(detail.getId())
                                 .productName(detail.getProductName())
                                 .productDetailName(detail.getProductDetailName())
                                 .subTotalPrice(detail.getSubTotalPrice()) // 상품 상세 수량 * 가격
