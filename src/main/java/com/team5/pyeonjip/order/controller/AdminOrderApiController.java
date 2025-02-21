@@ -42,7 +42,6 @@ public class AdminOrderApiController {
     }
 
     // 관리자 - 주문 삭제
-    // TODO : soft delete
     @DeleteMapping("orders/{orderId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteOrder(@PathVariable("orderId") Long orderId) {

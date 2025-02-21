@@ -97,6 +97,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             boolean isLocked = lock.tryLock(30, 10, TimeUnit.SECONDS);
             if (!isLocked) {
+                System.out.println("Lock 획득 실패: " + lockKey);
                 throw new GlobalException(ErrorCode.CONCURRENT_STOCK_UPDATE);
             }
 

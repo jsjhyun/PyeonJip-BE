@@ -31,8 +31,9 @@ public class Delivery extends BaseTimeEntity {
     @Builder
     public Delivery(String address, DeliveryStatus status) {
         this.address = address;
-        this.status = DeliveryStatus.READY;
+        this.status = status;
     }
+
 
     // == 비즈니스 로직 == //
 

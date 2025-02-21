@@ -57,7 +57,7 @@ public class Order extends BaseTimeEntity {
     private User user;
 
     @Column
-    private boolean deleted = Boolean.FALSE;
+    private boolean deleted = false;
 
     // == 비즈니스 로직 == //
 
