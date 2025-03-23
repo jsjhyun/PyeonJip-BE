@@ -31,6 +31,8 @@ public enum ErrorCode {
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "ORDER-01", "해당 주문을 찾을 수 없습니다."),
     USER_ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "ORDER-02", "해당 사용자의 주문을 찾을 수 없습니다."),
     DELIVERY_ALREADY_STARTED(HttpStatus.BAD_REQUEST, "DELIVERY-01", "배송이 시작된 주문은 취소할 수 없습니다."),
+    CONCURRENT_STOCK_UPDATE(HttpStatus.CONFLICT, "STOCK-02","동일한 상품의 재고가 동시에 변경 중입니다."),
+    LOCK_ACQUIRE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "STOCK-03","재고 락을 획득하는 데 실패했습니다."),
 
     // 장바구니
     CART_NOT_FOUND(HttpStatus.NOT_FOUND, "CART-01", "장바구니를 찾을 수 없습니다."),

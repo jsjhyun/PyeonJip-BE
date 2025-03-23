@@ -20,15 +20,19 @@ import com.team5.pyeonjip.user.entity.Grade;
 import com.team5.pyeonjip.user.entity.User;
 import com.team5.pyeonjip.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
+    private final RedissonClient redissonClient;
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final DeliveryRepository deliveryRepository;
@@ -85,14 +89,34 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 재고 감소
-    // TODO : Redis 분산 락
-    private void reduceStock(OrderDetailDto orderDetailDto) {
-        ProductDetail productDetail = findProductDetailById(orderDetailDto.getProductDetailId());
-        if (productDetail.getQuantity() < orderDetailDto.getQuantity()) {
-            throw new GlobalException(ErrorCode.OUT_OF_STOCK);
+    @Transactional
+    public void reduceStock(OrderDetailDto orderDetailDto) {
+        String lockKey = "lock:product:" + orderDetailDto.getProductDetailId();
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            boolean isLocked = lock.tryLock(30, 10, TimeUnit.SECONDS);
+            if (!isLocked) {
+                System.out.println("Lock 획득 실패: " + lockKey);
+                throw new GlobalException(ErrorCode.CONCURRENT_STOCK_UPDATE);
+            }
+
+            ProductDetail productDetail = productDetailRepository.findById(orderDetailDto.getProductDetailId())
+                    .orElseThrow(() -> new GlobalException(ErrorCode.PRODUCT_DETAIL_NOT_FOUND));
+
+            if (productDetail.getQuantity() < orderDetailDto.getQuantity()) {
+                throw new GlobalException(ErrorCode.OUT_OF_STOCK);
+            }
+            productDetail.setQuantity(productDetail.getQuantity() - orderDetailDto.getQuantity());
+            productDetailRepository.save(productDetail);
+
+        } catch (InterruptedException e) {
+            throw new GlobalException(ErrorCode.LOCK_ACQUIRE_FAILED);
+        } finally {
+            if(lock.isHeldByCurrentThread()){
+                lock.unlock();
+            }
         }
-        productDetail.setQuantity(productDetail.getQuantity() - orderDetailDto.getQuantity());
-        productDetailRepository.save(productDetail);
     }
 
     // 주문 상세 생성
@@ -205,11 +229,28 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // 재고 복구
-    // TODO : Redis 분산 락
-    private void restoreProductStock(Order order) {
+    @Transactional
+    public void restoreProductStock(Order order) {
         order.getOrderDetails().forEach(orderDetail -> {
-            ProductDetail productDetail = findProductDetailById(orderDetail.getProduct().getId());
-            productDetailService.updateDetailQuantity(productDetail.getId(), orderDetail.getQuantity());
+            String lockKey = "lock:product:" + orderDetail.getProduct().getId();
+            RLock lock = redissonClient.getLock(lockKey);
+
+            try{
+                boolean isLocked = lock.tryLock(10, 5, TimeUnit.SECONDS);
+                if (!isLocked) {
+                    throw new GlobalException(ErrorCode.CONCURRENT_STOCK_UPDATE);
+                }
+
+                ProductDetail productDetail = findProductDetailById(orderDetail.getProduct().getId());
+                productDetailService.updateDetailQuantity(productDetail.getId(), orderDetail.getQuantity());
+
+                } catch (InterruptedException e){
+                    throw new GlobalException(ErrorCode.LOCK_ACQUIRE_FAILED);
+                } finally {
+                    if(lock.isHeldByCurrentThread()){
+                        lock.unlock();
+                    }
+                }
         });
     }
 
