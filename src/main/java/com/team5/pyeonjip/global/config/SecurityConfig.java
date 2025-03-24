@@ -65,7 +65,8 @@ public class SecurityConfig {
 
                             // 데이터를 보내는 80번 포트를 허용
                                 configuration.setAllowedOrigins(List.of(
-                                        "http://localhost:3000"
+                                        "http://localhost:3000",
+                                        "https://verdant-truffle-6d5b23.netlify.app"
                                         // "https://ehedrefxzmygttpe.tunnel-pt.elice.io"
                                 ));
 
