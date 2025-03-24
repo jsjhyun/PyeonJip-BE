@@ -11,7 +11,7 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 //.allowedOrigins("https://ehedrefxzmygttpe.tunnel-pt.elice.io") // 허용할 Origin 설정
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("http://localhost:3000", "http://54.180.86.232:8080")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE") // 허용할 HTTP 메서드
                 .allowedHeaders("*") // 클라이언트가 서버로 보낼 때 허용되는 HTTP 헤더의 목록을 정의 현재는 모든 헤더 허용
                 .exposedHeaders("Authorization")
