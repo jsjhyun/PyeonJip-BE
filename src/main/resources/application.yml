@@ -11,6 +11,7 @@ spring:
       hibernate:
         format_sql: 'true'
         auto_quote_keyword: 'true'
+        database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
     show-sql: 'true'
@@ -26,6 +27,8 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+server:
+  address: 0.0.0.0
 #app:
 #  api:
 #    url: https://dsrkzpzrzxqkarjw.tunnel-pt.elice.io
